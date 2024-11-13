@@ -42,12 +42,12 @@ export class PostsController {
   // id에 해당하는 PostModel을 수정
   @Patch(':id')
   patchPost(
-    @Param('id') id: string,
+    @Param('id') postId: string,
     @Body('author') author?: string,
     @Body('title') title?: string,
     @Body('content') content?: string,
   ) {
-    return this.postsService.updatePost(+id, author, title, content);
+    return this.postsService.updatePost(+postId, author, title, content);
   }
 
   // 5) DELETE /posts/:id
