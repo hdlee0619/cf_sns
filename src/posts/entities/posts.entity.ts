@@ -6,7 +6,9 @@ export class PostsModel {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => UsersModel, (user) => user.posts)
+  @ManyToOne(() => UsersModel, (user) => user.posts, {
+    nullable: false,
+  })
   author: UsersModel;
 
   @Column()
