@@ -8,6 +8,7 @@ import {
   Delete,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
+import { UsersModel } from '../users/entities/users.entity';
 
 @Controller('posts')
 export class PostsController {
@@ -31,7 +32,7 @@ export class PostsController {
   // 새로운 PostModel을 생성
   @Post()
   createPost(
-    @Body('author') author: string,
+    @Body('author') author: UsersModel,
     @Body('title') title: string,
     @Body('content') content: string,
   ) {
@@ -43,7 +44,7 @@ export class PostsController {
   @Patch(':id')
   patchPost(
     @Param('id') postId: string,
-    @Body('author') author?: string,
+    @Body('author') author?: UsersModel,
     @Body('title') title?: string,
     @Body('content') content?: string,
   ) {
