@@ -6,6 +6,7 @@ import {
   Patch,
   Post,
   Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 
@@ -23,8 +24,8 @@ export class PostsController {
   // 2) GET /posts/:id
   // id에 해당하는 PostModel을 반환
   @Get(':id')
-  getPostById(@Param('id') id: string) {
-    return this.postsService.getPostById(+id);
+  getPostById(@Param('id', ParseIntPipe) id: number) {
+    return this.postsService.getPostById(id);
   }
 
   // 3) POST /posts
