@@ -1,10 +1,6 @@
 import { Headers, Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import {
-  MaxLengthPipe,
-  MinLengthPipe,
-  PasswordPipe,
-} from './pipe/password.pipe';
+import { MaxLengthPipe, MinLengthPipe } from './pipe/password.pipe';
 
 @Controller('auth')
 export class AuthController {
