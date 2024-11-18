@@ -1,14 +1,14 @@
 import {
+  Injectable,
   CanActivate,
   ExecutionContext,
-  Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from '../auth.service';
 import { UsersService } from '../../users/users.service';
 
 @Injectable()
-export abstract class BearerTokenGuard implements CanActivate {
+export class BearerTokenGuard implements CanActivate {
   constructor(
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
@@ -25,7 +25,7 @@ export abstract class BearerTokenGuard implements CanActivate {
 
     const token = this.authService.extractTokenFromHeader(rawToken, true);
 
-    const result = this.authService.verifyToken(token);
+    const result = await this.authService.verifyToken(token);
 
     /*
      * 1) 사용자 정보 - user
