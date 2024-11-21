@@ -1,9 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, LessThan, MoreThan, Repository } from 'typeorm';
 import { PostsModel } from './entities/posts.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { PaginatePostDto } from './dto/paginate-post.dto';
+import { HOST, PORT, PROTOCOL } from '../common/const/env.const';
 
 @Injectable()
 export class PostsService {
@@ -18,6 +20,79 @@ export class PostsService {
         author: true,
       },
     });
+  }
+
+  /*
+   * Response
+   *
+   * data: Data[],
+   * cursor: {
+   *  after: 마지막 Data의 id
+   * },
+   * count: 응답한 Data의 개수
+   * next: 다음 요청을 할 때 사용할 URL
+   * */
+  // 1) 오름차 순으로 정렬하는 pagination만 구현
+  async paginatePosts(dto: PaginatePostDto) {
+    const where: FindOptionsWhere<PostsModel> = {};
+
+    if (dto.where__id_less_than) {
+      where.id = LessThan(dto.where__id_less_than);
+    } else if (dto.where__id_more_than) {
+      where.id = MoreThan(dto.where__id_more_than);
+    }
+
+    const posts = await this.postsRepository.find({
+      where,
+      order: {
+        createdAt: dto.order__createdAt,
+      },
+      take: dto.take,
+    });
+
+    const lastItem =
+      posts.length > 0 && posts.length === dto.take
+        ? posts[posts.length - 1]
+        : null;
+
+    const nextUrl = lastItem && new URL(`${PROTOCOL}://${HOST}:${PORT}/posts`);
+
+    if (nextUrl) {
+      for (const key of Object.keys(dto)) {
+        if (dto[key]) {
+          if (key !== 'where__id_more_than' && key !== 'where__id_less_than') {
+            nextUrl.searchParams.append(key, dto[key]);
+          }
+        }
+      }
+      let key = null;
+
+      if (dto.order__createdAt === 'ASC') {
+        key = 'where__id_more_than';
+      } else {
+        key = 'where__id_less_than';
+      }
+
+      nextUrl.searchParams.append(key, lastItem.id.toString());
+    }
+
+    return {
+      data: posts,
+      cursor: {
+        after: lastItem?.id ?? null,
+      },
+      count: posts.length,
+      next: nextUrl?.toString(),
+    };
+  }
+
+  async generatePosts(userId: number) {
+    for (let i = 0; i < 100; i++) {
+      await this.createPost(userId, {
+        title: `임의로 생성된 포스트 제목 ${i}`,
+        content: `임의로 생성된 포스트 내용 ${i}`,
+      });
+    }
   }
 
   async getPostById(id: number) {
