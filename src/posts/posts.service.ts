@@ -17,13 +17,6 @@ export class PostsService {
       relations: {
         author: true,
       },
-      select: {
-        author: {
-          id: true,
-          nickname: true,
-          email: true,
-        },
-      },
     });
   }
 
