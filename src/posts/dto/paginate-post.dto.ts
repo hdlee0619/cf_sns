@@ -1,23 +1,12 @@
-import { IsIn, IsNumber, IsOptional } from 'class-validator';
+import { BasePaginationDto } from '../../common/dto/base-pagination.dto';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class PaginatePostDto {
+export class PaginatePostDto extends BasePaginationDto {
   @IsNumber()
   @IsOptional()
-  page?: number;
+  where__likeCount__more_than?: number;
 
-  @IsNumber()
+  @IsString()
   @IsOptional()
-  where__id_more_than?: number;
-
-  @IsNumber()
-  @IsOptional()
-  where__id_less_than?: number;
-
-  @IsIn(['ASC', 'DESC'])
-  @IsOptional()
-  order__createdAt: 'ASC' | 'DESC' = 'ASC';
-
-  @IsNumber()
-  @IsOptional()
-  take: number = 20;
+  where__title__i_like?: string;
 }
