@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersModel } from '../users/entities/users.entity';
 import { HASH_ROUND, JWT_SECRET } from './const/auth.const';
 import { UsersService } from '../users/users.service';
+import { RegisterUserDto } from './dto/register-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -158,9 +159,7 @@ export class AuthService {
     return this.loginUser(existingUser);
   }
 
-  async registerWithEmail(
-    user: Pick<UsersModel, 'email' | 'password' | 'nickname'>,
-  ) {
+  async registerWithEmail(user: RegisterUserDto) {
     const hash = await bcrypt.hash(user.password, HASH_ROUND);
 
     const newUser = await this.usersService.createUser({
