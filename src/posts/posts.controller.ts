@@ -36,7 +36,7 @@ export class PostsController {
   // 1) GET /posts
   // 모든 PostModel을 반환
   @Get()
-  @UseInterceptors(LogInterceptor)
+  // @UseInterceptors(LogInterceptor)
   getPost(@Query() query: PaginatePostDto) {
     return this.postsService.paginatePosts(query);
   }
