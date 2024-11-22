@@ -51,13 +51,10 @@ export class PostsController {
   // 새로운 PostModel을 생성
   @Post()
   @UseGuards(AccessTokenGuard)
-  @UseInterceptors(FileInterceptor('image'))
-  createPost(
-    @User('id') userId: number,
-    @Body() body: CreatePostDto,
-    @UploadedFile() file?: Express.Multer.File,
-  ) {
-    return this.postsService.createPost(userId, body, file?.filename);
+  async createPost(@User('id') userId: number, @Body() body: CreatePostDto) {
+    await this.postsService.createPostImage(body);
+
+    return this.postsService.createPost(userId, body);
   }
 
   // 4) PATCH /posts/:id
