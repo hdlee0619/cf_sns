@@ -55,7 +55,7 @@ export class PostsService {
     return post;
   }
 
-  async createPost(authorId: number, postDto: CreatePostDto) {
+  async createPost(authorId: number, postDto: CreatePostDto, image?: string) {
     // 1) create -> 저장할 객체를 생성
     // 2) save -> 객체를 저장 (create 메서드에서 생성한 객체를 저장)
     // 보편적인 방법, 객체를 정상적으로 생성하면 save 메서드를 호출하여 저장
@@ -64,6 +64,7 @@ export class PostsService {
         id: authorId,
       },
       ...postDto,
+      image: image,
       likeCount: 0,
       commentCount: 0,
     });
