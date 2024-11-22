@@ -17,6 +17,8 @@ import {
   ENV_DB_PORT_KEY,
   ENV_DB_USERNAME_KEY,
 } from './common/const/env-keys.const';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { PUBLIC_DIR_PATH } from './common/const/path.const';
 
 @Module({
   imports: [
@@ -34,7 +36,10 @@ import {
       entities: [PostsModel, UsersModel],
       synchronize: true,
     }),
-
+    ServeStaticModule.forRoot({
+      rootPath: PUBLIC_DIR_PATH,
+      serveRoot: '/public',
+    }),
     PostsModule,
     UsersModule,
     AuthModule,
