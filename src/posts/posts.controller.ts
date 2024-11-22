@@ -10,6 +10,7 @@ import {
   Post,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { AccessTokenGuard } from '../auth/guard/bearer-token.guard';
@@ -21,6 +22,7 @@ import { UsersModel } from '../users/entities/users.entity';
 import { ImageModelType } from '../common/entity/image.entity';
 import { DataSource } from 'typeorm';
 import { PostImagesService } from './image/images.service';
+import { LogInterceptor } from '../common/interceptor/log.interceptor';
 
 @Controller('posts')
 export class PostsController {
@@ -33,6 +35,7 @@ export class PostsController {
   // 1) GET /posts
   // 모든 PostModel을 반환
   @Get()
+  @UseInterceptors(LogInterceptor)
   getPost(@Query() query: PaginatePostDto) {
     return this.postsService.paginatePosts(query);
   }
