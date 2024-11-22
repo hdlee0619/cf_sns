@@ -2,15 +2,20 @@ import * as bcrypt from 'bcrypt';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersModel } from '../users/entities/users.entity';
-import { HASH_ROUND, JWT_SECRET } from './const/auth.const';
 import { UsersService } from '../users/users.service';
 import { RegisterUserDto } from './dto/register-user.dto';
+import { ConfigService } from '@nestjs/config';
+import {
+  ENV_HASH_ROUND_KEY,
+  ENV_JWT_SECRET_KEY,
+} from '../common/const/env-keys.const';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService,
+    private readonly configService: ConfigService,
   ) {}
   /*
    * 토큰 사용 방식
@@ -58,7 +63,7 @@ export class AuthService {
   verifyToken(token: string) {
     try {
       return this.jwtService.verify(token, {
-        secret: JWT_SECRET,
+        secret: this.configService.get<string>(ENV_JWT_SECRET_KEY),
       });
     } catch (e) {
       throw new UnauthorizedException('토큰이 만료됐거나 잘못된 토큰입니다.');
@@ -67,7 +72,7 @@ export class AuthService {
 
   rotateToken(token: string, isRefreshToken: boolean) {
     const decoded = this.jwtService.verify(token, {
-      secret: JWT_SECRET,
+      secret: this.configService.get<string>(ENV_JWT_SECRET_KEY),
     });
 
     if (decoded.type !== 'refresh') {
@@ -116,7 +121,7 @@ export class AuthService {
     };
 
     return this.jwtService.sign(payload, {
-      secret: JWT_SECRET,
+      secret: this.configService.get<string>(ENV_JWT_SECRET_KEY),
       // seconds
       expiresIn: isRefreshToken ? 3600 : 300,
     });
@@ -160,7 +165,10 @@ export class AuthService {
   }
 
   async registerWithEmail(user: RegisterUserDto) {
-    const hash = await bcrypt.hash(user.password, HASH_ROUND);
+    const hash = await bcrypt.hash(
+      user.password,
+      parseInt(this.configService.get<string>(ENV_HASH_ROUND_KEY)),
+    );
 
     const newUser = await this.usersService.createUser({
       ...user,

@@ -8,10 +8,17 @@ import {
 import { BasePaginationDto } from './dto/base-pagination.dto';
 import { BaseModel } from './entity/base.entity';
 import { FILTER_MAPPER } from './const/filter-mapper.const';
-import { HOST, PORT, PROTOCOL } from './const/env.const';
+import { ConfigService } from '@nestjs/config';
+import {
+  ENV_HOST_KEY,
+  ENV_PORT_KEY,
+  ENV_PROTOCOL_KEY,
+} from './const/env-keys.const';
 
 @Injectable()
 export class CommonService {
+  constructor(private readonly configService: ConfigService) {}
+
   paginate<T extends BaseModel>(
     dto: BasePaginationDto,
     repository: Repository<T>,
@@ -61,8 +68,12 @@ export class CommonService {
         ? results[results.length - 1]
         : null;
 
+    const protocol = this.configService.get<string>(ENV_PROTOCOL_KEY);
+    const host = this.configService.get<string>(ENV_HOST_KEY);
+    const port = this.configService.get<string>(ENV_PORT_KEY);
+
     const nextUrl =
-      lastItem && new URL(`${PROTOCOL}://${HOST}:${PORT}/${path}`);
+      lastItem && new URL(`${protocol}://${host}:${port}/${path}`);
 
     if (nextUrl) {
       for (const key of Object.keys(dto)) {
