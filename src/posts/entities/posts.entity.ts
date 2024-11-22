@@ -1,11 +1,9 @@
-import { Entity, Column, ManyToOne } from 'typeorm';
+import { Entity, Column, ManyToOne, OneToMany } from 'typeorm';
 import { UsersModel } from '../../users/entities/users.entity';
 import { BaseModel } from '../../common/entity/base.entity';
 import { IsString } from 'class-validator';
 import { stringValidationMessage } from '../../common/validation-message/string-validation-message';
-import { Transform } from 'class-transformer';
-import { join } from 'path';
-import { POST_PUBLIC_IMAGE_PATH } from '../../common/const/path.const';
+import { ImageModel } from '../../common/entity/image.entity';
 
 @Entity()
 export class PostsModel extends BaseModel {
@@ -30,9 +28,6 @@ export class PostsModel extends BaseModel {
   @Column()
   commentCount: number;
 
-  @Column({
-    nullable: true,
-  })
-  @Transform(({ value }) => value && `/${join(POST_PUBLIC_IMAGE_PATH, value)}`)
-  image?: string;
+  @OneToMany(() => ImageModel, (image) => image.post)
+  images: ImageModel[];
 }

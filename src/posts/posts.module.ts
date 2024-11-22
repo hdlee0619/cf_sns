@@ -6,16 +6,18 @@ import { PostsController } from './posts.controller';
 import { UsersModule } from '../users/users.module';
 import { AuthModule } from '../auth/auth.module';
 import { CommonModule } from '../common/common.module';
+import { ImageModel } from '../common/entity/image.entity';
+import { PostImagesService } from './image/images.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([PostsModel]),
+    TypeOrmModule.forFeature([PostsModel, ImageModel]),
     UsersModule,
     AuthModule,
     CommonModule,
   ],
   exports: [PostsService],
   controllers: [PostsController],
-  providers: [PostsService],
+  providers: [PostsService, PostImagesService],
 })
 export class PostsModule {}
