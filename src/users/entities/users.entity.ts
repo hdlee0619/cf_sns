@@ -9,6 +9,7 @@ import { stringValidationMessage } from '../../common/validation-message/string-
 import { emailValidationMessage } from '../../common/validation-message/email-validation-message';
 import { ChatsModel } from '../../chats/entity/chats.entity';
 import { MessagesModel } from '../../chats/messages/entity/messages.entity';
+import { CommentsModel } from '../../posts/comments/entities/comments.entity';
 
 @Entity()
 export class UsersModel extends BaseModel {
@@ -74,4 +75,7 @@ export class UsersModel extends BaseModel {
 
   @OneToMany(() => MessagesModel, (message) => message.author)
   messages: MessagesModel[];
+
+  @OneToMany(() => CommentsModel, (comment) => comment.author)
+  comments: CommentsModel[];
 }

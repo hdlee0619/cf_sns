@@ -23,6 +23,8 @@ import { ImageModel } from './common/entity/image.entity';
 import { ChatsModule } from './chats/chats.module';
 import { ChatsModel } from './chats/entity/chats.entity';
 import { MessagesModel } from './chats/messages/entity/messages.entity';
+import { CommentsModel } from './posts/comments/entities/comments.entity';
+import { CommentsModule } from './posts/comments/comments.module';
 
 @Module({
   imports: [
@@ -37,7 +39,14 @@ import { MessagesModel } from './chats/messages/entity/messages.entity';
       username: process.env[ENV_DB_USERNAME_KEY],
       password: process.env[ENV_DB_PASSWORD_KEY],
       database: process.env[ENV_DB_DATABASE_KEY],
-      entities: [PostsModel, UsersModel, ImageModel, ChatsModel, MessagesModel],
+      entities: [
+        PostsModel,
+        UsersModel,
+        ImageModel,
+        ChatsModel,
+        MessagesModel,
+        CommentsModel,
+      ],
       synchronize: true,
     }),
     ServeStaticModule.forRoot({
@@ -49,6 +58,7 @@ import { MessagesModel } from './chats/messages/entity/messages.entity';
     AuthModule,
     CommonModule,
     ChatsModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [
