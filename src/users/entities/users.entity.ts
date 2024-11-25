@@ -10,6 +10,7 @@ import { emailValidationMessage } from '../../common/validation-message/email-va
 import { ChatsModel } from '../../chats/entity/chats.entity';
 import { MessagesModel } from '../../chats/messages/entity/messages.entity';
 import { CommentsModel } from '../../posts/comments/entities/comments.entity';
+import { UserFollowersModel } from './user-followers.entity';
 
 @Entity()
 export class UsersModel extends BaseModel {
@@ -78,4 +79,13 @@ export class UsersModel extends BaseModel {
 
   @OneToMany(() => CommentsModel, (comment) => comment.author)
   comments: CommentsModel[];
+
+  // 나를 팔로우 하고 있는 사람들
+  @OneToMany(() => UserFollowersModel, (ufm) => ufm.follower)
+  @JoinTable()
+  followers: UserFollowersModel[];
+
+  // 내가 팔로우 하고 있는 사람들
+  @OneToMany(() => UserFollowersModel, (user) => user.following)
+  following: UserFollowersModel[];
 }
