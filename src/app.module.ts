@@ -1,5 +1,5 @@
 import { ClassSerializerInterceptor, Module } from '@nestjs/common';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -25,6 +25,8 @@ import { ChatsModel } from './chats/entity/chats.entity';
 import { MessagesModel } from './chats/messages/entity/messages.entity';
 import { CommentsModel } from './posts/comments/entities/comments.entity';
 import { CommentsModule } from './posts/comments/comments.module';
+import { RolesGuard } from './users/guard/roles.guard';
+import { AccessTokenGuard } from './auth/guard/bearer-token.guard';
 
 @Module({
   imports: [
@@ -66,6 +68,14 @@ import { CommentsModule } from './posts/comments/comments.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AccessTokenGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
 })

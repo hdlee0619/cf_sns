@@ -97,7 +97,7 @@ export class PostsService {
     });
 
     if (!post) {
-      throw new NotFoundException();
+      throw new NotFoundException('포스트가 존재하지 않습니다.');
     }
 
     if (title) {
@@ -130,6 +130,20 @@ export class PostsService {
     return await this.postsRepository.exists({
       where: {
         id,
+      },
+    });
+  }
+
+  async isPostMine(userId: number, postId: number) {
+    return await this.postsRepository.exists({
+      where: {
+        id: postId,
+        author: {
+          id: userId,
+        },
+      },
+      relations: {
+        author: true,
       },
     });
   }

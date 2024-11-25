@@ -12,7 +12,6 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { AccessTokenGuard } from '../auth/guard/bearer-token.guard';
 import { User } from '../users/decorator/user.decorator';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -23,6 +22,10 @@ import { DataSource, QueryRunner as QR } from 'typeorm';
 import { PostImagesService } from './image/images.service';
 import { TransactionInterceptor } from '../common/interceptor/transaction.interceptor';
 import { QueryRunner } from '../common/decorator/query-runner.decorator';
+import { Roles } from '../users/decorator/roles.decorator';
+import { RolesEnum } from '../users/const/roles.const';
+import { IsPublic } from '../common/decorator/is-public.decorator';
+import { IsPostMineOrAdminGuard } from './guard/is-post-mine-or-admin.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -35,7 +38,7 @@ export class PostsController {
   // 1) GET /posts
   // 모든 PostModel을 반환
   @Get()
-  // @UseInterceptors(LogInterceptor)
+  @IsPublic()
   getPost(@Query() query: PaginatePostDto) {
     return this.postsService.paginatePosts(query);
   }
@@ -43,12 +46,12 @@ export class PostsController {
   // 2) GET /posts/:id
   // id에 해당하는 PostModel을 반환
   @Get(':id')
+  @IsPublic()
   getPostById(@Param('id', ParseIntPipe) id: number) {
     return this.postsService.getPostById(id);
   }
 
   @Post('random')
-  @UseGuards(AccessTokenGuard)
   async postPostRandom(@User() user: UsersModel) {
     await this.postsService.generatePosts(user.id);
 
@@ -58,7 +61,6 @@ export class PostsController {
   // 3) POST /posts
   // 새로운 PostModel을 생성
   @Post()
-  @UseGuards(AccessTokenGuard)
   @UseInterceptors(TransactionInterceptor)
   async createPost(
     @User('id') userId: number,
@@ -79,20 +81,22 @@ export class PostsController {
       );
     }
 
-    return this.postsService.getPostById(post.id);
+    return this.postsService.getPostById(post.id, qr);
   }
 
   // 4) PATCH /posts/:id
   // id에 해당하는 PostModel을 수정
-  @Patch(':id')
-  patchPost(@Param('id') postId: string, @Body() body: UpdatePostDto) {
-    return this.postsService.updatePost(+postId, body);
+  @Patch(':postId')
+  @UseGuards(IsPostMineOrAdminGuard)
+  patchPost(@Param('postId') postId: number, @Body() body: UpdatePostDto) {
+    return this.postsService.updatePost(postId, body);
   }
 
   // 5) DELETE /posts/:id
   // id에 해당하는 PostModel을 삭제
   @Delete(':id')
-  deletePost(@Param('id') id: string) {
-    return this.postsService.deletePost(+id);
+  @Roles(RolesEnum.ADMIN)
+  deletePost(@Param('id') id: number) {
+    return this.postsService.deletePost(id);
   }
 }
